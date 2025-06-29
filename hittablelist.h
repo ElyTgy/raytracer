@@ -1,7 +1,7 @@
 #ifndef Hittable_LIST_H
 #define Hittable_LIST_H
 
-#include "Hittable.h"
+#include "hittable.h"
 
 #include <memory>
 #include <vector>
@@ -22,7 +22,7 @@ class Hittable_list : public Hittable {
         objects.push_back(object);
     }
 
-    bool hit(const ray& r, double ray_tmin, double ray_tmax, hit_record& rec) const override {
+    bool hit(const Ray& r, double ray_tmin, double ray_tmax, hit_record& rec) const override {
         hit_record temp_rec;
         bool hit_anything = false;
         auto closest_so_far = ray_tmax;
