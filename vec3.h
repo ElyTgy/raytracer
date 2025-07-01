@@ -3,6 +3,7 @@
 
 #include <cmath>
 #include <iostream>
+#include "utility.h"
 
 // Vec3 class for representing 3D vectors and points
 class Vec3 {
@@ -108,6 +109,32 @@ inline double Vec3::length() const {
 
 inline double Vec3::length_squared() const {
     return e[0] * e[0] + e[1] * e[1] + e[2] * e[2];
+}
+
+static Vec3 random_vec(){
+    return Vec3(random_double(), random_double(), random_double());
+}
+
+static Vec3 random_vec(double min, double max){
+    return Vec3(random_double(min, max), random_double(min, max), random_double(min, max));
+}
+
+
+inline Vec3 random_unit_vector(){
+    while(true){
+        Vec3 p = random_vec(-1.0, 1.0);
+        if(p.length() < 1.0){
+            return unit_vector(p);
+        }
+    }
+}
+
+inline Vec3 random_on_hemisphere(const Vec3& normal){
+    Vec3 on_unit_sphere = random_unit_vector();
+    if (dot(on_unit_sphere, normal) > 0.0) // In the same hemisphere as the normal
+        return on_unit_sphere;
+    else
+        return -on_unit_sphere;
 }
 
 #endif

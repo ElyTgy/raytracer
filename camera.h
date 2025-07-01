@@ -4,7 +4,15 @@
 #include "hittable.h"
 #include "color.h"
 #include "utility.h"
+#include "ray.h"
 #include <ostream>
+
+
+Color lerp_bg_color(const Ray& r){
+    Vec3 unit_dir = unit_vector(r.direction());
+    double a = 0.5*(unit_dir.x() + 1.0);
+    return (1.0-a)*Color(1.0, 1.0, 1.0) + a*Color(0.5, 0.7, 1.0);
+}
 
 class camera {
 public:
@@ -15,6 +23,7 @@ public:
     double viewport_height;
     double focal_length = 1.0;
     Point3 camera_center = Point3(0,0,0);
+    int    samples_per_pixel = 10;
 
     Vec3 viewport_u;
     Vec3 viewport_v;
@@ -47,16 +56,22 @@ public:
                 Vec3 ray_dir = curr_pixel_center - camera_center;
                 Ray curr_r(camera_center, ray_dir);
 
-                hit_record rec;
-                if (world.hit(curr_r, 0, infinity, rec)) {
-                    Color shading_color(1 + rec.normal.x(), 1 + rec.normal.y(), 1 + rec.normal.z());
-                    write_color(out, 0.5 * shading_color);
-                } else {
-                    write_color(out, bg_color(curr_r));
-                }
+                Color c = ray_color(curr_r, world);
+                write_color(out, c);
+
             }
         }
         std::clog << "\rDone.\n";
+    }
+
+    Color ray_color(const Ray& r, const Hittable& world) const {
+        hit_record rec;
+        if (world.hit(r, 0, infinity, rec)) {
+            Vec3 direction = random_on_hemisphere(rec.normal);
+            return 0.5 * ray_color(Ray(rec.intersect_point, direction), world);
+        } else {
+            return lerp_bg_color(r);
+        }
     }
 };
 
